@@ -1,118 +1,72 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { NativeModules } from 'react-native';
+ 
+const biometricAuth = NativeModules.BiometricAuthModule;
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+function App() {
+  
+  function handleButtonClick(){
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+    biometricAuth.isBiometricSupported((isSupported:boolean) => {
+      
+      if(isSupported) {
+
+        biometricAuth.authenticate((error:string, message:string) => {
+          if (error) {
+            Alert.alert(error)
+        
+          } else {
+            Alert.alert(message)
+          }
+        });
+      
+      }
+
+  });
+
+  }
+  
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={styles.container}>
+    
+      <Text style={styles.text}> Welcome to Biometric Authentication </Text>
+      <TouchableOpacity style={styles.buttonBackground} onPress={handleButtonClick}>
+      <Text style={styles.buttonText}>Biometric Authentication</Text>
+    </TouchableOpacity>
+    
     </View>
-  );
-}
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  sectionTitle: {
+  text: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color:"#3498db",
+    padding:16,
+    marginBottom:16
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  buttonBackground: {
+    backgroundColor: '#3498db',
+    padding: 8,
+    borderRadius: 5,
   },
-  highlight: {
-    fontWeight: '700',
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
+
+
 });
 
 export default App;
