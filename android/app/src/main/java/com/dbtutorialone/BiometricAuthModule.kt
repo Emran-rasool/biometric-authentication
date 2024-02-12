@@ -1,6 +1,5 @@
 package com.dbtutorialone
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -10,12 +9,11 @@ import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import kotlinx.coroutines.currentCoroutineContext
 
 class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactAppContext) {
 
-    var titlePrompt: String = "";
+    var titlePrompt: String = ""
 
     override fun getName(): String {
         return "BiometricAuthModule"
@@ -99,15 +97,15 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
         Toast.makeText(reactApplicationContext, message, Toast.LENGTH_LONG).show()
     }
 
-    private enum class ErrorCode(val value: Int, val message: String) {
-        BIOMETRIC_SUCCESS(0, "Biometric Success"),
-        BIOMETRIC_STATUS_UNKNOWN(-1, "Biometric status Unknown"),
-        BIOMETRIC_ERROR_UNSUPPORTED(-2, "Biometric Error Unsupported"),
-        BIOMETRIC_ERROR_HW_UNAVAILABLE(1, "Biometric Error Hardware Unavailable"),
-        BIOMETRIC_ERROR_NONE_ENROLLED(11, "Biometric Error None Enrolled"),
-        BIOMETRIC_ERROR_NO_HARDWARE(12, "Biometric Error No Hardware"),
-        AUTHENTICATION_FAILED(13, "Biometric is registered but not authorised with Current User."),
-        AUTHENTICATION_ERROR(14, "Authentication Error");
+    private enum class ErrorCode(val message: String) {
+        BIOMETRIC_SUCCESS("Biometric Success"),
+        BIOMETRIC_STATUS_UNKNOWN("Biometric status Unknown"),
+        BIOMETRIC_ERROR_UNSUPPORTED("Biometric Error Unsupported"),
+        BIOMETRIC_ERROR_HW_UNAVAILABLE("Biometric Error Hardware Unavailable"),
+        BIOMETRIC_ERROR_NONE_ENROLLED("Biometric Error None Enrolled"),
+        BIOMETRIC_ERROR_NO_HARDWARE("Biometric Error No Hardware"),
+        AUTHENTICATION_FAILED("Biometric is registered but not authorised with Current User."),
+        AUTHENTICATION_ERROR("Authentication Error");
 
     }
 
