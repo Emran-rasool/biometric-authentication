@@ -16,6 +16,13 @@ class BiometricAuth(private val activity: FragmentActivity) {
         val biometricPrompt = BiometricPrompt(activity, MainThreadExecutor(),
             object : BiometricPrompt.AuthenticationCallback() {
 
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    //  showMessage("Authentication error: $errString")
+                    callback.onError(errorCode, errString.toString())
+                }
+
+
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     callback.onSuccess()
@@ -23,7 +30,7 @@ class BiometricAuth(private val activity: FragmentActivity) {
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    callback.onError()
+                    callback.onAuthFailed()
                 }
 
             })
@@ -33,7 +40,8 @@ class BiometricAuth(private val activity: FragmentActivity) {
 
     interface BiometricCallback {
         fun onSuccess()
-        fun onError()
+        fun onError(errorCode: Int, errorString: String)
+        fun onAuthFailed()
         val title: String
         val subTitle: String
         val cancel: String

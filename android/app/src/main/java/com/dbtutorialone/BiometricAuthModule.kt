@@ -1,9 +1,7 @@
 package com.dbtutorialone
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
 import androidx.biometric.BiometricManager
 import androidx.fragment.app.FragmentActivity
 import com.facebook.react.bridge.Callback
@@ -27,41 +25,19 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
         val context = currentActivity as FragmentActivity
 
         val biometricManager = BiometricManager.from(context)
-        val result =
+        val result: String =
             when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
 
-                BiometricManager.BIOMETRIC_SUCCESS -> {
-                    // showMessage(ErrorCode.BIOMETRIC_SUCCESS.message)
-                    true
-                }
+                BiometricManager.BIOMETRIC_SUCCESS -> ErrorCode.BIOMETRIC_SUCCESS.toString()
+                BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> ErrorCode.BIOMETRIC_ERROR_NO_HARDWARE.toString()
+                BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> ErrorCode.BIOMETRIC_ERROR_HW_UNAVAILABLE.toString()
+                BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> ErrorCode.BIOMETRIC_ERROR_NONE_ENROLLED.toString()
+                BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> ErrorCode.BIOMETRIC_ERROR_UNSUPPORTED.toString()
+                else -> ErrorCode.BIOMETRIC_STATUS_UNKNOWN.toString()
 
-                BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
-                    showMessage(context, ErrorCode.BIOMETRIC_ERROR_NO_HARDWARE.message)
-                    false
-                }
-
-                BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-                    showMessage(context, ErrorCode.BIOMETRIC_ERROR_HW_UNAVAILABLE.message)
-                    false
-                }
-
-                BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                    showMessage(context, ErrorCode.BIOMETRIC_ERROR_NONE_ENROLLED.message)
-                    false
-                }
-
-                BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> {
-                    showMessage(context, ErrorCode.BIOMETRIC_ERROR_UNSUPPORTED.message)
-                    false
-                }
-
-                else -> {
-                    showMessage(context, ErrorCode.BIOMETRIC_STATUS_UNKNOWN.message)
-                    false
-                }
             }
-
         callback.invoke(result)
+
     }
 
     @ReactMethod
@@ -81,10 +57,14 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
             biometricAuth.authenticate(object : BiometricAuth.BiometricCallback {
 
                 override fun onSuccess() {
-                    callback.invoke(null,"Authentication successful")
+                    callback.invoke(null, "Authentication successful")
                 }
 
-                override fun onError() {
+                override fun onError(errorCode: Int, errorString: String) {
+                    callback.invoke("Authentication Error: $errorString")
+                }
+
+                override fun onAuthFailed() {
                     callback.invoke("Authentication failed")
                 }
 
@@ -100,18 +80,15 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
         }
     }
 
-
-    @ReactMethod
-    private fun showMessage(context: Context, message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-    }
-
-    private enum class ErrorCode(val message: String) {
-        BIOMETRIC_STATUS_UNKNOWN("Biometric status Unknown"),
-        BIOMETRIC_ERROR_UNSUPPORTED("Biometric Error Unsupported"),
-        BIOMETRIC_ERROR_HW_UNAVAILABLE("Biometric Error Hardware Unavailable"),
-        BIOMETRIC_ERROR_NONE_ENROLLED("Biometric Error None Enrolled"),
-        BIOMETRIC_ERROR_NO_HARDWARE("Biometric Error No Hardware"),
+    enum class ErrorCode {
+        BIOMETRIC_SUCCESS,
+        BIOMETRIC_STATUS_UNKNOWN,
+        BIOMETRIC_ERROR_UNSUPPORTED,
+        BIOMETRIC_ERROR_HW_UNAVAILABLE,
+        BIOMETRIC_ERROR_NONE_ENROLLED,
+        BIOMETRIC_ERROR_NO_HARDWARE,
+        AUTHENTICATION_FAILED,
+        AUTHENTICATION_ERROR;
 
     }
 
