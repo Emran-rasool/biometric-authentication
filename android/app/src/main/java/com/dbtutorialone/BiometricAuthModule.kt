@@ -15,6 +15,8 @@ import kotlinx.coroutines.currentCoroutineContext
 class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactAppContext) {
 
+    var titlePrompt: String = "";
+
     override fun getName(): String {
         return "BiometricAuthModule"
     }
@@ -62,6 +64,12 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
     }
 
     @ReactMethod
+    fun promptTitle(title: String) {
+
+        titlePrompt = title;
+    }
+
+    @ReactMethod
     fun authenticate(callback: Callback) {
         val activity = currentActivity as FragmentActivity
 
@@ -70,16 +78,21 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
             biometricAuth.authenticate(object : BiometricAuth.BiometricCallback {
 
                 override fun onSuccess() {
-                    callback.invoke(null, "Authentication successful")
+                    callback.invoke(null, ErrorCode.BIOMETRIC_SUCCESS)
                 }
 
                 override fun onError() {
-                    callback.invoke("Authentication failed")
+                    callback.invoke(ErrorCode.AUTHENTICATION_ERROR)
                 }
+
+                override val title: String
+                    get() = titlePrompt
+
             })
 
         }
     }
+
 
     @ReactMethod
     private fun showMessage(message: String) {

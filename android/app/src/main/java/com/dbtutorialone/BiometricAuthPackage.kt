@@ -10,7 +10,7 @@ class BiometricAuthPackage : ReactPackage {
 
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
         val modules = mutableListOf<NativeModule>()
-        modules.add(BiometricAuthModule(reactContext)) // Add your native module instance here
+        modules.add(BiometricAuthModule(reactContext)) // Added native module
         return modules
     }
 
