@@ -13,7 +13,8 @@ function App() {
       
       if(isSupported) {
 
-        biometricAuth.promptTitle("Biometric Authentication");
+        biometricAuth.authenticationPrompt("Biometric Authentication",
+        "Authenticate using your biometric credentials","Cancel");
         biometricAuth.authenticate((error:string, message:string) => {
           if (error) {
             Alert.alert(error)

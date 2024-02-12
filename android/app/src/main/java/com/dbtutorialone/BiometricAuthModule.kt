@@ -1,5 +1,6 @@
 package com.dbtutorialone
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -14,6 +15,8 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactAppContext) {
 
     var titlePrompt: String = ""
+    var subTitlePrompt: String = ""
+    var cancelPrompt: String = ""
 
     override fun getName(): String {
         return "BiometricAuthModule"
@@ -33,27 +36,27 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
                 }
 
                 BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
-                    showMessage(ErrorCode.BIOMETRIC_ERROR_NO_HARDWARE.message)
+                    showMessage(context, ErrorCode.BIOMETRIC_ERROR_NO_HARDWARE.message)
                     false
                 }
 
                 BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-                    showMessage(ErrorCode.BIOMETRIC_ERROR_HW_UNAVAILABLE.message)
+                    showMessage(context, ErrorCode.BIOMETRIC_ERROR_HW_UNAVAILABLE.message)
                     false
                 }
 
                 BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                    showMessage(ErrorCode.BIOMETRIC_ERROR_NONE_ENROLLED.message)
+                    showMessage(context, ErrorCode.BIOMETRIC_ERROR_NONE_ENROLLED.message)
                     false
                 }
 
                 BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> {
-                    showMessage(ErrorCode.BIOMETRIC_ERROR_UNSUPPORTED.message)
+                    showMessage(context, ErrorCode.BIOMETRIC_ERROR_UNSUPPORTED.message)
                     false
                 }
 
                 else -> {
-                    showMessage(ErrorCode.BIOMETRIC_STATUS_UNKNOWN.message)
+                    showMessage(context, ErrorCode.BIOMETRIC_STATUS_UNKNOWN.message)
                     false
                 }
             }
@@ -62,9 +65,11 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun promptTitle(title: String) {
+    fun authenticationPrompt(titleArg: String, subTitleArg: String, cancelArg: String) {
+        titlePrompt = titleArg
+        subTitlePrompt = subTitleArg
+        cancelPrompt = cancelArg
 
-        titlePrompt = title;
     }
 
     @ReactMethod
@@ -76,15 +81,19 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
             biometricAuth.authenticate(object : BiometricAuth.BiometricCallback {
 
                 override fun onSuccess() {
-                    callback.invoke(null, ErrorCode.BIOMETRIC_SUCCESS)
+                    callback.invoke(null,"Authentication successful")
                 }
 
                 override fun onError() {
-                    callback.invoke(ErrorCode.AUTHENTICATION_ERROR)
+                    callback.invoke("Authentication failed")
                 }
 
                 override val title: String
                     get() = titlePrompt
+                override val subTitle: String
+                    get() = subTitlePrompt
+                override val cancel: String
+                    get() = cancelPrompt
 
             })
 
@@ -93,19 +102,16 @@ class BiometricAuthModule(reactAppContext: ReactApplicationContext) :
 
 
     @ReactMethod
-    private fun showMessage(message: String) {
-        Toast.makeText(reactApplicationContext, message, Toast.LENGTH_LONG).show()
+    private fun showMessage(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
     private enum class ErrorCode(val message: String) {
-        BIOMETRIC_SUCCESS("Biometric Success"),
         BIOMETRIC_STATUS_UNKNOWN("Biometric status Unknown"),
         BIOMETRIC_ERROR_UNSUPPORTED("Biometric Error Unsupported"),
         BIOMETRIC_ERROR_HW_UNAVAILABLE("Biometric Error Hardware Unavailable"),
         BIOMETRIC_ERROR_NONE_ENROLLED("Biometric Error None Enrolled"),
         BIOMETRIC_ERROR_NO_HARDWARE("Biometric Error No Hardware"),
-        AUTHENTICATION_FAILED("Biometric is registered but not authorised with Current User."),
-        AUTHENTICATION_ERROR("Authentication Error");
 
     }
 

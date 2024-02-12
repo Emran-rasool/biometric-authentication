@@ -9,8 +9,8 @@ class BiometricAuth(private val activity: FragmentActivity) {
     fun authenticate(callback: BiometricCallback) {
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(callback.title)
-            .setSubtitle("Authenticate using your biometric credentials")
-            .setNegativeButtonText("Cancel")
+            .setSubtitle(callback.subTitle)
+            .setNegativeButtonText(callback.cancel)
             .build()
 
         val biometricPrompt = BiometricPrompt(activity, MainThreadExecutor(),
@@ -34,7 +34,9 @@ class BiometricAuth(private val activity: FragmentActivity) {
     interface BiometricCallback {
         fun onSuccess()
         fun onError()
-        val title:String
+        val title: String
+        val subTitle: String
+        val cancel: String
     }
 
 
